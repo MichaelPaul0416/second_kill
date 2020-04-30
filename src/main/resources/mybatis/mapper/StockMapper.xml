@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wq.shop.example.dao.inter.StockDao">
+
+    <resultMap id="StockResult" type="Stock">
+        <id property="id" column="id" javaType="Integer"/>
+        <result property="sale" column="sale" javaType="Integer"/>
+        <result property="version" column="version" javaType="Integer"/>
+        <result property="count" column="count" javaType="Integer"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="insertStock" parameterType="Stock">
+        INSERT INTO stock VALUE (#{id}, #{name}, #{count}, #{sale},#{version})
+    </insert>
+
+    <select id="getStockById" parameterType="java.lang.Integer" resultMap="StockResult">
+        select id,sale,version,count,name from stock where id = #{_parameter}
+    </select>
+
+    <update id="updateStockById" parameterType="Stock">
+        update stock
+        <trim prefix="set" suffixOverrides=",">
+            <if test="sale > 0">
+                sale = #{sale},
+            </if>
+            <if test="version > 0">
+                version = #{version},
+            </if>
+            <if test="count > 0">
+                count = #{count},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateStockByOptimisticLock" parameterType="StockOrder">
+        update stock
+        <set>
+            sale = sale + 1,
+            version = version + 1,
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+        and version = #{version,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectStockForUpdate" parameterType="java.lang.Integer" resultMap="StockResult">
+        select  id,sale,version,count,name from stock where id = #{_parameter} for update
+    </select>
+</mapper>

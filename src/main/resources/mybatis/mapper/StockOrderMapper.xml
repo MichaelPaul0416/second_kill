@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wq.shop.example.dao.inter.StockOrderDao">
+
+    <resultMap id="StockResult" type="StockOrder">
+        <id property="id" column="id" javaType="Integer"/>
+        <result property="sid" column="sid" javaType="Integer"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" javaType="String"/>
+        <result property="orderStatus" column="order_status" javaType="Integer"/>
+    </resultMap>
+
+    <insert id="insertStockOrder" parameterType="StockOrder" useGeneratedKeys="true">
+        INSERT INTO stock_order VALUE (#{id}, #{sid}, #{name}, #{createTime},#{orderStatus})
+    </insert>
+</mapper>
