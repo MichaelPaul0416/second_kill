@@ -1,17 +1,24 @@
 package com.wq.shop.example.service;
 
 import com.wq.shop.example.Constant.CommonConstants;
+import com.wq.shop.example.config.CacheGlobalConfig;
 import com.wq.shop.example.dao.bean.Stock;
 import com.wq.shop.example.dao.bean.StockOrder;
+import com.wq.shop.example.dao.bean.User;
 import com.wq.shop.example.dao.inter.StockDao;
 import com.wq.shop.example.dao.inter.StockOrderDao;
+import com.wq.shop.example.dao.inter.UserDao;
 import com.wq.shop.example.exception.KillException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.DigestUtils;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: wangqiang20995
@@ -28,6 +35,15 @@ public class StockService {
 
     @Autowired
     private StockOrderDao stockOrderDao;
+
+    @Autowired
+    private UserDao userDao;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private CacheGlobalConfig cacheGlobalConfig;
 
     /**
      * 啥都不用，直接暴露接口
@@ -75,6 +91,29 @@ public class StockService {
         return stock.getCount() - stock.getSale();
 
 
+    }
+
+    public String getVerifyHash(int sid, int userId) {
+        // userId check
+        checkUserExist(userId);
+
+        checkStock(sid);
+
+        String plain = CacheKey.HASH_SALT_KEY.getKey() + userId + sid;
+
+        String hash = DigestUtils.md5DigestAsHex(plain.getBytes());
+        redisTemplate.opsForValue().set(plain, hash, cacheGlobalConfig.getExpireCacheKey(), TimeUnit.SECONDS);
+        logger.info("cache put:{}", plain);
+        return hash;
+    }
+
+    public int createWithHashCode(int sid,int userId,String )
+
+    private void checkUserExist(int userId) {
+        User user = userDao.getUserById(userId);
+        if (user == null) {
+            throw new KillException("9998", "用户不存在");
+        }
     }
 
     private void saleStockOptimistic(Stock stock) {

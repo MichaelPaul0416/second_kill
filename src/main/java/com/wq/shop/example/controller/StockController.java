@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.TimeUnit;
@@ -95,8 +96,14 @@ public class StockController {
         return String.format("购买成功，剩余库存为：%d", left);
     }
 
+    /**
+     * 悲观锁抢购
+     *
+     * @param sid
+     * @return
+     */
     @RequestMapping("/createWithPessimisticLock/{sid}")
-    public String createWithPessimisticLock(@PathVariable int sid){
+    public String createWithPessimisticLock(@PathVariable int sid) {
         int id;
         try {
             id = stockService.createPessimisticOrder(sid);
@@ -106,5 +113,28 @@ public class StockController {
             return "购买失败，库存不足";
         }
         return String.format("购买成功，剩余库存为：%d", id);
+    }
+
+    /**
+     * 防止机器刷单，接口预先生成一个hash值用于后面的下单
+     *
+     * @param userId
+     * @param sid
+     * @return
+     */
+    @RequestMapping("/generateVerifyHash")
+    public String generateVerifyHash(int userId, int sid) {
+        try {
+            return stockService.getVerifyHash(sid, userId);
+        } catch (Throwable e) {
+            logger.error("生成hash值失败:{}", e.getMessage(), e);
+            return "服务异常，生成hash值失败";
+        }
+
+    }
+
+    @RequestMapping(value = "createWithHashCode", method = RequestMethod.POST)
+    public String createWithHashCode(int sid, int userId, String hash) {
+
     }
 }
