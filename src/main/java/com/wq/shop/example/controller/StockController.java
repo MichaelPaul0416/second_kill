@@ -135,6 +135,12 @@ public class StockController {
 
     @RequestMapping(value = "createWithHashCode", method = RequestMethod.POST)
     public String createWithHashCode(int sid, int userId, String hash) {
-
+        try {
+            int num = stockService.createWithHashCode(sid, userId, hash);
+            return "下单成功-" + num;
+        } catch (Throwable e) {
+            logger.error(e.getMessage(), e);
+            return "下单异常";
+        }
     }
 }

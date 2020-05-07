@@ -2,9 +2,11 @@ package com.wq.shop.example.service;
 
 import com.wq.shop.example.Constant.CommonConstants;
 import com.wq.shop.example.config.CacheGlobalConfig;
+import com.wq.shop.example.dao.bean.OrderUser;
 import com.wq.shop.example.dao.bean.Stock;
 import com.wq.shop.example.dao.bean.StockOrder;
 import com.wq.shop.example.dao.bean.User;
+import com.wq.shop.example.dao.inter.OrderUserDao;
 import com.wq.shop.example.dao.inter.StockDao;
 import com.wq.shop.example.dao.inter.StockOrderDao;
 import com.wq.shop.example.dao.inter.UserDao;
@@ -38,6 +40,9 @@ public class StockService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private OrderUserDao orderUserDao;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -107,7 +112,28 @@ public class StockService {
         return hash;
     }
 
-    public int createWithHashCode(int sid,int userId,String )
+    public int createWithHashCode(int sid, int userId, String hash) {
+        String key = CacheKey.HASH_SALT_KEY.getKey() + userId + sid;
+        String cacheValued = (String) redisTemplate.opsForValue().get(key);
+
+        if (cacheValued == null || !cacheValued.equals(hash)) {
+            throw new KillException("9997", "盐值不匹配，请求不合法");
+        }
+
+        checkUserExist(userId);
+
+        checkStock(sid);
+
+        //
+        int left = createOptimisticStock(sid);
+
+        // user->order
+        OrderUser orderUser = new OrderUser();
+        orderUser.setUserId(userId);
+        orderUserDao.insertOrderUser(orderUser);
+
+        return left;
+    }
 
     private void checkUserExist(int userId) {
         User user = userDao.getUserById(userId);

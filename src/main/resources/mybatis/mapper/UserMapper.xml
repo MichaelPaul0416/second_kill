@@ -9,6 +9,6 @@
     </resultMap>
 
     <select id="getUserById" resultType="User" parameterType="java.lang.Integer">
-        select id,user_namefrom user where id = #{_parameter}
+        select id,user_name from user where id = #{_parameter}
     </select>
 </mapper>

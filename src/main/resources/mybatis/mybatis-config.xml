@@ -8,6 +8,7 @@
         <typeAlias type="com.wq.shop.example.dao.bean.Stock" alias="Stock"/>
         <typeAlias type="com.wq.shop.example.dao.bean.StockOrder" alias="StockOrder"/>
         <typeAlias type="com.wq.shop.example.dao.bean.User" alias="User"/>
+        <typeAlias type="com.wq.shop.example.dao.bean.OrderUser" alias="OrderUser"/>
     </typeAliases>
 
 </configuration>

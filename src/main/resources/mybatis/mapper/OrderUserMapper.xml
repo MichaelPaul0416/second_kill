@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wq.shop.example.dao.inter.OrderUserDao">
+    <resultMap id="OrderUserResult" type="OrderUser">
+        <id javaType="java.lang.Integer" column="serial_no" property="serialNo"/>
+        <result javaType="java.lang.Integer" column="user_id" property="userId"/>
+        <result javaType="java.lang.String" column="create_time" property="createTime"/>
+    </resultMap>
+
+    <insert id="insertOrderUser" parameterType="OrderUser">
+        insert into order_user(user_id,create_time) value(#{userId},#{createTime})
+    </insert>
+</mapper>
